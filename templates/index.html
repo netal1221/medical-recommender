@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MediSense — Smart Health Recommender</title>
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="nav-brand">
+    <div class="nav-icon">+</div>
+    <span>MediSense</span>
+  </div>
+  <div class="nav-links">
+    <a href="/">Home</a>
+    <a href="/about">About</a>
+    <a href="/how">How it works</a>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="hero-content">
+    <div class="hero-badge">AI-Powered Health Insights</div>
+    <h1>Smart Medical<br><span class="highlight">Recommendation</span><br>System</h1>
+    <p>Select your symptoms and get instant AI-powered disease prediction.</p>
+    <a href="#checker" class="btn-primary">Check Symptoms Now</a>
+  </div>
+</section>
+
+<section class="checker" id="checker">
+  <div class="container">
+    <h2>Symptom Checker</h2>
+
+    <div class="checker-card">
+
+      <input type="text" placeholder="Search symptoms..." 
+             oninput="filterSymptoms(this.value)">
+
+      <div class="symptoms-grid">
+        {% for symptom in symptoms %}
+        <label class="symptom-chip">
+          <input type="checkbox" name="symptoms" value="{{ symptom }}" onchange="updateSelected()">
+          <span>{{ symptom.replace('_', ' ').title() }}</span>
+        </label>
+        {% endfor %}
+      </div>
+
+      <div id="selected-bar" style="display:none">
+        <span id="selected-count">0 selected</span>
+        <button onclick="clearAll()">Clear</button>
+      </div>
+
+      <button id="predict-btn" onclick="predict()">
+        Analyse Symptoms
+      </button>
+
+    </div>
+  </div>
+</section>
+
+<section id="results-section" style="display:none">
+  <h2 id="result-disease"></h2>
+  <p id="result-confidence"></p>
+  <p id="result-description"></p>
+
+  <h3>Medicines</h3>
+  <ul id="result-medicines"></ul>
+
+  <h3>Diet</h3>
+  <ul id="result-diet"></ul>
+
+  <h3>Workout</h3>
+  <ul id="result-workout"></ul>
+</section>
+
+<script>
+function predict() {
+  const selected = Array.from(document.querySelectorAll('input[name="symptoms"]:checked'))
+                        .map(cb => cb.value);
+
+  if (selected.length === 0) {
+    alert("Please select at least one symptom.");
+    return;
+  }
+
+  fetch('/predict', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ symptoms: selected })
+  })
+  .then(res => res.json())
+  .then(data => {
+    document.getElementById("results-section").style.display = "block";
+
+    document.getElementById("result-disease").textContent = "Disease: " + data.disease;
+    document.getElementById("result-confidence").textContent = "Confidence: " + data.confidence + "%";
+    document.getElementById("result-description").textContent = data.description;
+
+    document.getElementById("result-medicines").innerHTML =
+      data.medicines.map(m => `<li>${m}</li>`).join("");
+
+    document.getElementById("result-diet").innerHTML =
+      data.diet.map(d => `<li>${d}</li>`).join("");
+
+    document.getElementById("result-workout").innerHTML =
+      data.workout.map(w => `<li>${w}</li>`).join("");
+  })
+  .catch(err => {
+    console.error(err);
+    alert("Server error");
+  });
+}
+
+function clearAll() {
+  document.querySelectorAll('input[name="symptoms"]').forEach(cb => cb.checked = false);
+  document.getElementById("selected-bar").style.display = "none";
+  document.getElementById("selected-count").textContent = "0 selected";
+}
+
+function updateSelected() {
+  const selected = document.querySelectorAll('input[name="symptoms"]:checked').length;
+  document.getElementById("selected-count").textContent = selected + " selected";
+  document.getElementById("selected-bar").style.display = selected > 0 ? "block" : "none";
+}
+
+function filterSymptoms(query) {
+  document.querySelectorAll(".symptom-chip").forEach(chip => {
+    const text = chip.textContent.toLowerCase();
+    chip.style.display = text.includes(query.toLowerCase()) ? "inline-block" : "none";
+  });
+}
+</script>
+
+</body>
+</html>
