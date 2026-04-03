@@ -36,7 +36,7 @@ disease_info = {
     }
 }
 
-# 🔥 SYMPTOM MAPPING (cleaned)
+# 🔥 SYMPTOM MAPPING
 symptom_data = {
     "fever": {"med": ["Paracetamol"], "diet": ["Soup", "Warm water"], "work": ["Rest"]},
     "cough": {"med": ["Cough syrup"], "diet": ["Honey tea"], "work": ["Rest"]},
@@ -80,7 +80,7 @@ def clean_list(data_set):
         if item and item.strip() and item.strip() != "-"
     ))
 
-# 🔥 FINAL PREDICT
+# 🔥 PREDICT
 @app.route('/predict', methods=['POST'])
 def predict():
     data = request.get_json()
@@ -95,33 +95,26 @@ def predict():
 
     disease_name = le.inverse_transform([prediction_encoded])[0]
 
-    # STEP 1: disease-based
     info = disease_info.get(disease_name)
 
-    # STEP 2: fallback (symptom-based)
     if not info:
         meds, diet, workout = set(), set(), set()
 
         for s in selected_symptoms:
-            data = symptom_data.get(s)
+            d = symptom_data.get(s)
+            if d:
+                meds.update(d.get("med", []))
+                diet.update(d.get("diet", []))
+                workout.update(d.get("work", []))
 
-            if data:
-                meds.update(data.get("med", []))
-                diet.update(data.get("diet", []))
-                workout.update(data.get("work", []))
-
-        # CLEAN
         meds = clean_list(meds)
         diet = clean_list(diet)
         workout = clean_list(workout)
 
-        # FINAL FALLBACK (never empty)
         if not meds:
             meds = ["Paracetamol", "General checkup"]
-
         if not diet:
             diet = ["Balanced diet", "Fruits", "Stay hydrated"]
-
         if not workout:
             workout = ["Walking", "Light exercise", "Proper rest"]
 
@@ -141,6 +134,7 @@ def predict():
         "workout": info["workout"]
     })
 
-if __name__ == '__main__':
-    if __name__ == "__main__":
+# ✅ FINAL FIX (IMPORTANT)
+if __name__ == "__main__":
     app.run(host="0.0.0.0", port=10000)
+    
