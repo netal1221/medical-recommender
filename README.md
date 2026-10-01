@@ -1,28 +1,20 @@
 # medical-recommender
 
-# 🏥 Medical Recommendation System
+#  Medical Recommendation System
 
 A Machine Learning-based web application that predicts diseases based on user symptoms and provides basic recommendations such as medicines, diet, and workout.
 
----
-
-## 🚀 Live Demo
-
-🔗 https://medical-recommender.onrender.com
-
----
-
 ## 📌 Features
 
-* 🔍 Predicts disease based on symptoms
-* 💊 Suggests basic medicines
-* 🥗 Recommends diet plans
-* 🏃 Suggests workouts
-* 🌐 User-friendly web interface
+*  Predicts disease based on symptoms
+*  Suggests basic medicines
+*  Recommends diet plans
+*  Suggests workouts
+*  User-friendly web interface
 
 ---
 
-## 🧠 Tech Stack
+##  Tech Stack
 
 * Python
 * Flask
@@ -33,7 +25,7 @@ A Machine Learning-based web application that predicts diseases based on user sy
 
 ---
 
-## 📊 How It Works
+##  How It Works
 
 * User enters symptoms
 * Machine learning model predicts disease
@@ -42,12 +34,6 @@ A Machine Learning-based web application that predicts diseases based on user sy
   * Disease name
   * Confidence score
   * Recommendations (medicine, diet, workout)
-
----
-
-## ⚠️ Disclaimer
-
-This project is for educational purposes only and not a substitute for professional medical advice.
 
 ---
 
@@ -63,14 +49,6 @@ medical-recommender/
 │── static/
 │── requirements.txt
 ```
-
----
-
-## 👩‍💻 Author
-
-Netal Sharma
-
----
 
 ## ⭐ Future Improvements
 
